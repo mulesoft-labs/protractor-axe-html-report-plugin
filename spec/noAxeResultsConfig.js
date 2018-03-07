@@ -8,6 +8,11 @@ exports.config = {
   plugins: [{
     path: '../index.js',
     ignoreAxeFailures: true,
+    htmlReportPath: 'reports',
+    displayHelpUrl: true,
+    displayContext: true,
+    displayPasses: true,
+    displayViolations: true,
     standardsToReport: []
   }]
 };
