@@ -115,3 +115,7 @@ Enable this plugin in your config file:
 
 # A request...
 This is my first NPM package so please be gentle with me! If you've got any feedback about how I can make it better please let me know - thanks.
+
+# TODO
+- Complete renaming of project and related documentation update
+- Add documentation about using the testapp
