@@ -7,6 +7,11 @@ exports.config = {
   baseUrl: env.baseUrl,
   plugins: [{
     path: '../index.js',
+    htmlReportPath: 'reports',
+    displayHelpUrl: true,
+    displayContext: true,
+    displayPasses: true,
+    displayViolations: true,
     standardsToReport: []
   }]
 };
