@@ -38,7 +38,6 @@ const indent = '  ';
 
 function setup() {
   browser.runAxeTest = runAxeTest;
-  browser.runAxeTestWithSelector = runAxeTestWithSelector;
 }
 
 function onPrepare() {
@@ -54,7 +53,7 @@ function onPrepare() {
   pluginConfig.globalParams = getDefault(pluginConfig.globalParams, {});
 }
 
-runAxeTest = function(testName) {
+runAxeTest = function(testName, selector) {
   var params = pluginConfig.globalParams;
   const builder = AxeBuilder(browser.driver);
 
@@ -64,39 +63,7 @@ runAxeTest = function(testName) {
         browserName = capabilities.get('browserName');
         if (browserName === 'chrome' || browserName === 'firefox') {
           if (params.include) ensureArray(params.include).forEach((item) => builder.include(item));
-          if (params.exclude) ensureArray(params.exclude).forEach((item) => builder.exclude(item));
-          if (params.options) builder.options(params.options);
-          builder.analyze((results) => {
-              addResults(testName, browserName, results);
-              resolve(results);
-            });
-        } else {
-          console.log(`Skipping aXe tests in unsupported browser (${browserName}).`);
-          resolve();
-        }
-      });
-  });
-}
-
-runAxeTestWithSelector = function(testName, selector) {
-  var params = pluginConfig.globalParams;
-  if (selector) {
-    if (params.include) {
-      params.include = ensureArray(params.include);
-      params.include.push(selector);
-    } else {
-      params.include = selector;
-    };
-  };
-
-  const builder = AxeBuilder(browser.driver);
-
-  return new Promise((resolve, reject) => {
-    browser.driver.getCapabilities()
-      .then((capabilities) => {
-        browserName = capabilities.get('browserName');
-        if (browserName === 'chrome' || browserName === 'firefox') {
-          if (params.include) ensureArray(params.include).forEach((item) => builder.include(item));
+          if (selector) ensureArray(selector).forEach((item) => builder.include(item));
           if (params.exclude) ensureArray(params.exclude).forEach((item) => builder.exclude(item));
           if (params.options) builder.options(params.options);
           builder.analyze((results) => {
@@ -377,4 +344,3 @@ exports.onPrepare = onPrepare;
 exports.postTest = postTest;
 exports.postResults = postResults;
 exports.runAxeTest = runAxeTest;
-exports.runAxeTestWithSelector = runAxeTestWithSelector;

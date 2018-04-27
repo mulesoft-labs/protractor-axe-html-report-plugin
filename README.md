@@ -5,12 +5,12 @@ This package is a derivation of the [protractor-accessibility-plugin](https://gi
 
 This plugin only uses the aXe Accessibility Engine, and can generate accessibility reports from any point during the test run. Key features:
 
-*  Make a call to `runAxeTest(testName, driver)` once the webdriver has loaded the page under test, and you will get a report for that page. Example:
+*  Make a call to `runAxeTest(testName)` once the webdriver has loaded the page under test, and you will get a report for that page. Example:
 
 
 ```js
 it('Check accessibility', function() {
-  runAxeTest('Signin page', browser.driver);
+  runAxeTest('Signin page');
 });
 ```
 
@@ -26,7 +26,7 @@ Output:
  Pass: ARIA roles used must conform to valid values 
 ```
 
-* You can also use `runAxeTestWithSelector(testName, driver, selector)` specify the CSS selector to use to get just a part of the page (handy for testing modal dialogs):
+* You can also use `runAxeTest(testName, selector)` specify the CSS selector to use to get just a part of the page (handy for testing modal dialogs):
 
 ```js
   it('myDetails click', function() {
@@ -35,7 +35,7 @@ Output:
     expect(mainPage.modalDialog.isDisplayed()).toBe(true);
     expect(element(by.id('healthcareProfessionalDetailsForm')).isDisplayed()).toBe(true);
 
-    runAxeTestWithSelector('Clinician details', browser.driver, '.modal-dialog');
+    runAxeTest('Clinician details', '.modal-dialog');
   });
 ```
 
