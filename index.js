@@ -28,6 +28,7 @@ var AxeBuilder = require('axe-webdriverjs');
 const allTestResults = [];
 var currentTestResults = [];
 var browserName = '';
+var pluginConfig = {};
 
 const green = '\x1b[32m';
 const red = '\x1b[31m';
@@ -35,14 +36,37 @@ const grey = '\x1b[37m';
 const normalColor = '\x1b[39m';
 const indent = '  ';
 
+function setup() {
+  browser.runAxeTest = runAxeTest;
+}
+
+function onPrepare() {
+  pluginConfig = this.config;
+
+  pluginConfig.ignoreAxeFailures = getDefault(pluginConfig.ignoreAxeFailures, false);
+  pluginConfig.displayHelpUrl = getDefault(pluginConfig.displayHelpUrl, true);
+  pluginConfig.displayContext = getDefault(pluginConfig.displayContext, true);
+  pluginConfig.displayPasses = getDefault(pluginConfig.displayPasses, true);
+  pluginConfig.displayViolations = getDefault(pluginConfig.displayViolations, true);
+  pluginConfig.standardsToReport = getDefault(pluginConfig.standardsToReport, []);
+  pluginConfig.htmlReportPath = getDefault(pluginConfig.htmlReportPath, null);
+  pluginConfig.globalParams = getDefault(pluginConfig.globalParams, {});
+}
+
 runAxeTest = function(testName) {
+  var params = pluginConfig.globalParams;
+  const builder = AxeBuilder(browser.driver);
+
+
   return new Promise((resolve, reject) => {
     browser.driver.getCapabilities()
       .then((capabilities) => {
         browserName = capabilities.get('browserName');
         if (browserName === 'chrome' || browserName === 'firefox') {
-          AxeBuilder(browser.driver)
-            .analyze((results) => {
+          if (params.include) ensureArray(params.include).forEach((item) => builder.include(item));
+          if (params.exclude) ensureArray(params.exclude).forEach((item) => builder.exclude(item));
+          if (params.options) builder.options(params.options);
+          builder.analyze((results) => {
               addResults(testName, browserName, results);
               resolve(results);
             });
@@ -54,41 +78,35 @@ runAxeTest = function(testName) {
   });
 }
 
-runAxeTestWithSelector = function(testName, selector) {
-  return new Promise((resolve, reject) => {
-    browser.driver.getCapabilities()
-      .then((capabilities) => {
-        browserName = capabilities.get('browserName');
-        if (browserName === 'chrome' || browserName === 'firefox') {
-          AxeBuilder(browser.driver)
-            .include(selector)
-            .analyze(function (results) {
-              addResults(testName, results);
-              resolve(results);
-            });
-        } else {
-          console.log(`Skipping aXe tests in unsupported browser (${browserName}).`);
-          resolve();
-        }
-      });
-  });
-}
+/* function mergeParams(testParams) {
+  var params = {};
+  const globalOptions = pluginConfig.globalParams.options || {};
+  const testOptions = testParams.options || {};
 
-function setup() {
-  browser.runAxeTest = runAxeTest;
-  browser.runAxeTestWithSelector = runAxeTestWithSelector;
-}
+  if (globalOptions.branding || testOptions.branding) {
+    params.options.branding = globalOptions.branding ? globalOptions.branding : testOptions.branding;
+  };
+  if (globalOptions.reporter || testOptions.reporter) {
+    params.options.reporter = globalOptions.reporter ? globalOptions.reporter : testOptions.reporter;
+  };
+  if (globalOptions.checks || testOptions.checks) {
+    params.options.checks = globalOptions.checks ? Array.of(globalOptions.checks, testOptions.checks) : testOptions.checks;
+  };
+  if (globalOptions.rules || testOptions.rules) {
+    params.options.rules = globalOptions.rules ? ensureArray(globalOptions.rules).concat(testOptions.rules || []) : testOptions.checks;
+  };
+  if (pluginConfig.globalParams.include || testParams.include) {
+    params.include = pluginConfig.globalParams.include ? Array.of(ensureArray(pluginConfig.globalParams.include), ensureArray(testParams.include)) : testParams.include;
+  };
+  if (pluginConfig.globalParams.exclude || testParams.exclude) {
+    params.exclude = pluginConfig.globalParams.exclude ? Array.of(ensureArray(pluginConfig.globalParams.exclude), ensureArray(testParams.exclude)) : testParams.exclude;
+  };
 
-function onPrepare() {
-  var pluginConfig = this.config;
+  return params;
+} */
 
-  pluginConfig.ignoreAxeFailures = getDefault(pluginConfig.ignoreAxeFailures, false);
-  pluginConfig.displayHelpUrl = getDefault(pluginConfig.displayHelpUrl, true);
-  pluginConfig.displayContext = getDefault(pluginConfig.displayContext, true);
-  pluginConfig.displayPasses = getDefault(pluginConfig.displayPasses, true);
-  pluginConfig.displayViolations = getDefault(pluginConfig.displayViolations, true);
-  pluginConfig.standardsToReport = getDefault(pluginConfig.standardsToReport, []);
-  pluginConfig.htmlReportPath = getDefault(pluginConfig.htmlReportPath, null);
+function ensureArray(potentialArray) {
+  return Array.isArray(potentialArray) ? potentialArray : [potentialArray];
 }
 
 function postTest(passed, testInfo) {
@@ -353,4 +371,3 @@ exports.onPrepare = onPrepare;
 exports.postTest = postTest;
 exports.postResults = postResults;
 exports.runAxeTest = runAxeTest;
-exports.runAxeTestWithSelector = runAxeTestWithSelector;
