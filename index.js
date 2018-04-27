@@ -38,6 +38,7 @@ const indent = '  ';
 
 function setup() {
   browser.runAxeTest = runAxeTest;
+  browser.runAxeTestWithSelector = runAxeTestWithSelector;
 }
 
 function onPrepare() {
@@ -56,7 +57,6 @@ function onPrepare() {
 runAxeTest = function(testName) {
   var params = pluginConfig.globalParams;
   const builder = AxeBuilder(browser.driver);
-
 
   return new Promise((resolve, reject) => {
     browser.driver.getCapabilities()
@@ -78,32 +78,38 @@ runAxeTest = function(testName) {
   });
 }
 
-/* function mergeParams(testParams) {
-  var params = {};
-  const globalOptions = pluginConfig.globalParams.options || {};
-  const testOptions = testParams.options || {};
-
-  if (globalOptions.branding || testOptions.branding) {
-    params.options.branding = globalOptions.branding ? globalOptions.branding : testOptions.branding;
-  };
-  if (globalOptions.reporter || testOptions.reporter) {
-    params.options.reporter = globalOptions.reporter ? globalOptions.reporter : testOptions.reporter;
-  };
-  if (globalOptions.checks || testOptions.checks) {
-    params.options.checks = globalOptions.checks ? Array.of(globalOptions.checks, testOptions.checks) : testOptions.checks;
-  };
-  if (globalOptions.rules || testOptions.rules) {
-    params.options.rules = globalOptions.rules ? ensureArray(globalOptions.rules).concat(testOptions.rules || []) : testOptions.checks;
-  };
-  if (pluginConfig.globalParams.include || testParams.include) {
-    params.include = pluginConfig.globalParams.include ? Array.of(ensureArray(pluginConfig.globalParams.include), ensureArray(testParams.include)) : testParams.include;
-  };
-  if (pluginConfig.globalParams.exclude || testParams.exclude) {
-    params.exclude = pluginConfig.globalParams.exclude ? Array.of(ensureArray(pluginConfig.globalParams.exclude), ensureArray(testParams.exclude)) : testParams.exclude;
+runAxeTestWithSelector = function(testName, selector) {
+  var params = pluginConfig.globalParams;
+  if (selector) {
+    if (params.include) {
+      params.include = ensureArray(params.include);
+      params.include.push(selector);
+    } else {
+      params.include = selector;
+    };
   };
 
-  return params;
-} */
+  const builder = AxeBuilder(browser.driver);
+
+  return new Promise((resolve, reject) => {
+    browser.driver.getCapabilities()
+      .then((capabilities) => {
+        browserName = capabilities.get('browserName');
+        if (browserName === 'chrome' || browserName === 'firefox') {
+          if (params.include) ensureArray(params.include).forEach((item) => builder.include(item));
+          if (params.exclude) ensureArray(params.exclude).forEach((item) => builder.exclude(item));
+          if (params.options) builder.options(params.options);
+          builder.analyze((results) => {
+              addResults(testName, browserName, results);
+              resolve(results);
+            });
+        } else {
+          console.log(`Skipping aXe tests in unsupported browser (${browserName}).`);
+          resolve();
+        }
+      });
+  });
+}
 
 function ensureArray(potentialArray) {
   return Array.isArray(potentialArray) ? potentialArray : [potentialArray];
@@ -371,3 +377,4 @@ exports.onPrepare = onPrepare;
 exports.postTest = postTest;
 exports.postResults = postResults;
 exports.runAxeTest = runAxeTest;
+exports.runAxeTestWithSelector = runAxeTestWithSelector;
