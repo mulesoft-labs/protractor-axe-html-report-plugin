@@ -87,12 +87,13 @@ Only returning results for the following standards: wcag2aa
 
 This makes it easy to focus on just the standard that you are working on at that time. 
 
+
 # Installation
 ```
 sudo npm install -g protractor-axe-report-plugin
 ```
 
-Enable this plugin in your config file:
+Enable this plugin in the protractor.conf.js file:
 
 ```js
     exports.config = {
@@ -104,10 +105,29 @@ Enable this plugin in your config file:
 	        displayViolations: true|false, // Display vioaltions. Defaults to true.
 	        standardsToReport: ['wcag2a', 'wcag2aa'], // A list of standards to report on. If empty, reports on all standards.
 	        ignoreAxeFailures: true|false, // If true, aXe failures won't cause the whole test to fail. Defaults to false
-	        package: 'protractor-axe-report-plugin',
+					package: 'protractor-axe-report-plugin',
+					globalParams: {} // This is a configuration object, see below for more detail.
 	    }]
 	}
 ```
+#Configuration
+
+Global configuration can be done in the protractor.conf.js file by providing an object to the globalParams key.  The contents of this object are descirbed in the [axe-core documentation](https://github.com/dequelabs/axe-core/blob/develop/doc/API.md).  A sample object is shown below.
+
+```js
+	...
+	globalParams: {
+		exclude: 'mat-select',
+		options: {
+			runOnly: {
+				type: 'tag',
+				values: ['wcag2a', 'wcag2aa']
+			}
+		}
+	}
+	...
+```
+
 # Testing
 - Install requirements. I prefer `yarn` so I do `yarn install`
 - Start the local server: `npm start`
