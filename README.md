@@ -90,7 +90,7 @@ This makes it easy to focus on just the standard that you are working on at that
 
 # Installation
 ```
-sudo npm install -g protractor-axe-report-plugin
+Coming soon
 ```
 
 Enable this plugin in the protractor.conf.js file:
