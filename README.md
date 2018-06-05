@@ -90,7 +90,7 @@ This makes it easy to focus on just the standard that you are working on at that
 
 # Installation
 ```
-Coming soon
+npm i -g protractor-axe-html-report-plugin
 ```
 
 Enable this plugin in the protractor.conf.js file:
@@ -136,4 +136,3 @@ Global configuration can be done in the protractor.conf.js file by providing an 
 # TODO
 - Complete renaming of project and related documentation update
 - Add documentation about using the testapp
-- Publish as an NPM package
