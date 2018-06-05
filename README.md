@@ -5,12 +5,12 @@ This package is a derivation of the [protractor-accessibility-plugin](https://gi
 
 This plugin only uses the aXe Accessibility Engine, and can generate accessibility reports from any point during the test run. Key features:
 
-*  Make a call to `runAxeTest(testName, driver)` once the webdriver has loaded the page under test, and you will get a report for that page. Example:
+*  Make a call to `runAxeTest(testName)` once the webdriver has loaded the page under test, and you will get a report for that page. Example:
 
 
 ```js
 it('Check accessibility', function() {
-	runAxeTest('Signin page', browser.driver);
+  runAxeTest('Signin page');
 });
 ```
 
@@ -26,7 +26,7 @@ Output:
  Pass: ARIA roles used must conform to valid values 
 ```
 
-* You can also use `runAxeTestWithSelector(testName, driver, selector)` specify the CSS selector to use to get just a part of the page (handy for testing modal dialogs):
+* You can also use `runAxeTest(testName, selector)` specify the CSS selector to use to get just a part of the page (handy for testing modal dialogs):
 
 ```js
   it('myDetails click', function() {
@@ -35,7 +35,7 @@ Output:
     expect(mainPage.modalDialog.isDisplayed()).toBe(true);
     expect(element(by.id('healthcareProfessionalDetailsForm')).isDisplayed()).toBe(true);
 
-    runAxeTestWithSelector('Clinician details', browser.driver, '.modal-dialog');
+    runAxeTest('Clinician details', '.modal-dialog');
   });
 ```
 
@@ -87,27 +87,47 @@ Only returning results for the following standards: wcag2aa
 
 This makes it easy to focus on just the standard that you are working on at that time. 
 
+
 # Installation
 ```
 sudo npm install -g protractor-axe-report-plugin
 ```
 
-Enable this plugin in your config file:
+Enable this plugin in the protractor.conf.js file:
 
 ```js
-    exports.config = {
-	    ...
-	    plugins: [{
-	        displayHelpUrl: true|false, // Displays the aXe help URL along with the error. Defaults to true. 
-	        displayContext: true|false, // Displays the HTML of interest. Defaults to true.
-	        displayPasses: true|false, // Display pass results. Defaults to true.
-	        displayViolations: true|false, // Display vioaltions. Defaults to true.
-	        standardsToReport: ['wcag2a', 'wcag2aa'], // A list of standards to report on. If empty, reports on all standards.
-	        ignoreAxeFailures: true|false, // If true, aXe failures won't cause the whole test to fail. Defaults to false
-	        package: 'protractor-axe-report-plugin',
-	    }]
-	}
+  exports.config = {
+    ...
+    plugins: [{
+        displayHelpUrl: true|false, // Displays the aXe help URL along with the error. Defaults to true. 
+        displayContext: true|false, // Displays the HTML of interest. Defaults to true.
+        displayPasses: true|false, // Display pass results. Defaults to true.
+        displayViolations: true|false, // Display vioaltions. Defaults to true.
+        standardsToReport: ['wcag2a', 'wcag2aa'], // A list of standards to report on. If empty, reports on all standards.
+        ignoreAxeFailures: true|false, // If true, aXe failures won't cause the whole test to fail. Defaults to false
+        package: 'protractor-axe-report-plugin',
+        globalParams: {} // This is a configuration object, see below for more detail.
+    }]
+  }
 ```
+#Configuration
+
+Global configuration can be done in the protractor.conf.js file by providing an object to the globalParams key.  The contents of this object are descirbed in the [axe-core documentation](https://github.com/dequelabs/axe-core/blob/develop/doc/API.md).  A sample object is shown below.
+
+```js
+  ...
+  globalParams: {
+    exclude: 'mat-select',
+    options: {
+      runOnly: {
+        type: 'tag',
+        values: ['wcag2a', 'wcag2aa']
+      }
+    }
+  }
+  ...
+```
+
 # Testing
 - Install requirements. I prefer `yarn` so I do `yarn install`
 - Start the local server: `npm start`
