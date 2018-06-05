@@ -133,9 +133,7 @@ Global configuration can be done in the protractor.conf.js file by providing an 
 - Start the local server: `npm start`
 - Run the tests: `npm test`
 
-# A request...
-This is my first NPM package so please be gentle with me! If you've got any feedback about how I can make it better please let me know - thanks.
-
 # TODO
 - Complete renaming of project and related documentation update
 - Add documentation about using the testapp
+- Publish as an NPM package
