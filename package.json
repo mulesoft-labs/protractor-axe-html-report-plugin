@@ -2,7 +2,6 @@
   "name": "protractor-axe-html-report-plugin",
   "version": "0.0.1",
   "dependencies": {
-    "axe-core": "^2.0.5",
     "axe-webdriverjs": "^2.0.1",
     "handlebars": "4.0.11",
     "httpster": "1.0.3",
