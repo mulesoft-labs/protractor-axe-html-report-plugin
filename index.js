@@ -66,7 +66,11 @@ runAxeTest = function(testName, selector) {
           if (selector) ensureArray(selector).forEach((item) => builder.include(item));
           if (params.exclude) ensureArray(params.exclude).forEach((item) => builder.exclude(item));
           if (params.options) builder.options(params.options);
-          builder.analyze((results) => {
+          builder.analyze((err, results) => {
+              if (err) {
+                return reject(err);
+              }
+
               addResults(testName, browserName, results);
               resolve(results);
             });
